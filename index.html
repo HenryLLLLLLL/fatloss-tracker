@@ -175,6 +175,40 @@ canvas{width:100%!important}
 .loading{text-align:center;padding:30px;color:var(--sub)}
 .spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 10px}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* Auth overlay */
+.auth-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;z-index:999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+}
+.auth-card{
+  width:100%;max-width:340px;text-align:center;
+  background:var(--card);border-radius:var(--radius);
+  padding:40px 28px;border:1px solid var(--border);
+}
+.auth-icon{font-size:48px;margin-bottom:16px}
+.auth-card h2{font-size:20px;font-weight:700;margin-bottom:6px}
+.auth-card p{font-size:13px;color:var(--sub);margin-bottom:24px}
+.auth-card input{
+  width:100%;padding:12px 16px;border:1px solid var(--border);
+  border-radius:var(--radius-sm);font-size:16px;text-align:center;
+  background:var(--bg);color:var(--text);font-family:inherit;
+  -webkit-appearance:none;
+  letter-spacing:4px;
+}
+.auth-card input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,113,227,.15)}
+.auth-card .btn{margin-top:16px}
+.auth-error{
+  display:none;color:var(--red);font-size:13px;
+  margin-top:10px;
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-8px)}
+  50%{transform:translateX(8px)}
+  75%{transform:translateX(-6px)}
+}
 /* Modal for weight entry */
 .modal-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;
@@ -220,9 +254,25 @@ canvas{width:100%!important}
 </head>
 <body>
 
+<!-- ===== AUTH GATE ===== -->
+<div id="authOverlay" class="auth-overlay" style="display:none">
+  <div class="auth-card">
+    <div class="auth-icon">🔐</div>
+    <h2>FatLoss 减脂追踪</h2>
+    <p>输入密码以查看数据</p>
+    <input type="password" id="authPassword" placeholder="输入密码" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <button id="authBtn" class="btn">解锁</button>
+    <div class="auth-error" id="authError"></div>
+  </div>
+</div>
+
+<!-- ===== APP CONTENT ===== -->
+<div id="appContent">
+
 <div class="header">
   <h1>FatLoss 减脂追踪</h1>
   <span class="badge" id="statusBadge">目标65kg</span>
+  <button onclick="sessionStorage.removeItem('fatloss_auth');location.reload()" style="background:none;border:none;font-size:18px;cursor:pointer;padding:4px 8px;border-radius:8px" title="锁定">🔒</button>
 </div>
 
 <div class="tabs">
@@ -428,7 +478,8 @@ canvas{width:100%!important}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
-<script src="config.js"></script>
-<script src="app.js?v=1"></script>
+<script src="config.js?v=2"></script>
+<script src="app.js?v=2"></script>
+</div><!-- /appContent -->
 </body>
 </html>
