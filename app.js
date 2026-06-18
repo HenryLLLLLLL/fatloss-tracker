@@ -8,6 +8,69 @@ let currentForm = 'weight';
 let selectedMeal = 'breakfast';
 let selectedTraining = 'boxing_strength';
 
+// ============ AUTH GATE ============
+async function sha256(message) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function checkAuth() {
+  // Already authenticated this session?
+  if (sessionStorage.getItem('fatloss_auth') === 'true') {
+    init();
+    return;
+  }
+
+  // Show login overlay
+  const overlay = document.getElementById('authOverlay');
+  overlay.style.display = 'flex';
+  const input = document.getElementById('authPassword');
+  const error = document.getElementById('authError');
+  const btn = document.getElementById('authBtn');
+
+  async function doLogin() {
+    const pw = input.value.trim();
+    if (!pw) return;
+
+    btn.disabled = true;
+    btn.textContent = '验证中...';
+
+    try {
+      const hash = await sha256(pw);
+      if (hash === AUTH_HASH) {
+        sessionStorage.setItem('fatloss_auth', 'true');
+        overlay.style.display = 'none';
+        init();
+      } else {
+        error.textContent = '密码错误';
+        error.style.display = 'block';
+        input.value = '';
+        input.focus();
+        // Shake animation
+        overlay.querySelector('.auth-card').style.animation = 'none';
+        overlay.querySelector('.auth-card').offsetHeight;
+        overlay.querySelector('.auth-card').style.animation = 'shake 0.4s ease';
+      }
+    } catch (err) {
+      error.textContent = '验证失败，请重试';
+      error.style.display = 'block';
+    }
+
+    btn.disabled = false;
+    btn.textContent = '解锁';
+  }
+
+  btn.addEventListener('click', doLogin);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+  // Auto-focus password field
+  setTimeout(() => input.focus(), 200);
+}
+
 // ============ INIT ============
 function init() {
   if (!SUPABASE_CONFIG.url || SUPABASE_CONFIG.url.includes('YOUR-PROJECT-ID')) {
@@ -589,6 +652,6 @@ function yAxisConfig(label) {
 }
 
 // ============ START ============
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', checkAuth);
 
 })();
