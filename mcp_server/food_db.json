@@ -1,0 +1,42 @@
+{
+  "defaults": {
+    "鸡蛋": {"calories": 70, "protein_g": 6, "carbs_g": 1, "fat_g": 5, "unit": "个"},
+    "鸡胸肉": {"calories": 133, "protein_g": 31, "carbs_g": 0, "fat_g": 1.5, "unit": "100g"},
+    "牛肉": {"calories": 125, "protein_g": 26, "carbs_g": 0, "fat_g": 3, "unit": "100g"},
+    "牛奶": {"calories": 135, "protein_g": 6.5, "carbs_g": 10, "fat_g": 6.5, "unit": "250ml"},
+    "米饭": {"calories": 200, "protein_g": 4, "carbs_g": 44, "fat_g": 0.5, "unit": "碗(150g)"},
+    "面包": {"calories": 250, "protein_g": 8, "carbs_g": 48, "fat_g": 3, "unit": "片(100g)"},
+    "香蕉": {"calories": 105, "protein_g": 1.3, "carbs_g": 27, "fat_g": 0.4, "unit": "根"},
+    "苹果": {"calories": 95, "protein_g": 0.5, "carbs_g": 25, "fat_g": 0.3, "unit": "个"},
+    "蛋白粉": {"calories": 120, "protein_g": 25, "carbs_g": 3, "fat_g": 1, "unit": "勺(30g)"},
+    "三文鱼": {"calories": 208, "protein_g": 20, "carbs_g": 0, "fat_g": 13, "unit": "100g"},
+    "虾": {"calories": 99, "protein_g": 24, "carbs_g": 0, "fat_g": 0.3, "unit": "100g"},
+    "豆腐": {"calories": 76, "protein_g": 8, "carbs_g": 2, "fat_g": 4, "unit": "100g"},
+    "西兰花": {"calories": 34, "protein_g": 3, "carbs_g": 6, "fat_g": 0.3, "unit": "100g"},
+    "黄瓜": {"calories": 15, "protein_g": 0.7, "carbs_g": 2.9, "fat_g": 0.1, "unit": "100g"},
+    "番茄": {"calories": 18, "protein_g": 0.9, "carbs_g": 3.9, "fat_g": 0.2, "unit": "个"},
+    "土豆": {"calories": 76, "protein_g": 2, "carbs_g": 17, "fat_g": 0.1, "unit": "100g"},
+    "红薯": {"calories": 86, "protein_g": 1.6, "carbs_g": 20, "fat_g": 0.1, "unit": "100g"},
+    "燕麦": {"calories": 150, "protein_g": 5, "carbs_g": 27, "fat_g": 3, "unit": "碗(40g)"},
+    "面条": {"calories": 280, "protein_g": 9, "carbs_g": 57, "fat_g": 1, "unit": "碗(250g)"},
+    "饺子": {"calories": 250, "protein_g": 10, "carbs_g": 30, "fat_g": 10, "unit": "份(10个)"},
+    "炒青菜": {"calories": 60, "protein_g": 2, "carbs_g": 5, "fat_g": 3, "unit": "份"},
+    "红烧肉": {"calories": 350, "protein_g": 15, "carbs_g": 8, "fat_g": 28, "unit": "份(150g)"},
+    "宫保鸡丁": {"calories": 300, "protein_g": 22, "carbs_g": 12, "fat_g": 18, "unit": "份"},
+    "麻辣烫": {"calories": 400, "protein_g": 20, "carbs_g": 35, "fat_g": 20, "unit": "碗"},
+    "沙拉": {"calories": 200, "protein_g": 15, "carbs_g": 10, "fat_g": 10, "unit": "份"},
+    "火锅": {"calories": 800, "protein_g": 40, "carbs_g": 30, "fat_g": 55, "unit": "顿"},
+    "烧烤": {"calories": 600, "protein_g": 35, "carbs_g": 10, "fat_g": 45, "unit": "顿"},
+    "咖啡": {"calories": 5, "protein_g": 0.3, "carbs_g": 1, "fat_g": 0, "unit": "杯"},
+    "奶茶": {"calories": 300, "protein_g": 5, "carbs_g": 40, "fat_g": 15, "unit": "杯"},
+    "果汁": {"calories": 120, "protein_g": 0.5, "carbs_g": 28, "fat_g": 0.2, "unit": "杯"},
+    "可乐": {"calories": 140, "protein_g": 0, "carbs_g": 35, "fat_g": 0, "unit": "罐"}
+  },
+  "meal_aggregates": {
+    "食堂快餐": {"calories": 600, "protein_g": 25, "carbs_g": 70, "fat_g": 25},
+    "食堂盖饭": {"calories": 700, "protein_g": 28, "carbs_g": 85, "fat_g": 28},
+    "食堂面食": {"calories": 550, "protein_g": 18, "carbs_g": 75, "fat_g": 18},
+    "普通盒饭": {"calories": 650, "protein_g": 28, "carbs_g": 75, "fat_g": 25},
+    "健身餐": {"calories": 450, "protein_g": 35, "carbs_g": 40, "fat_g": 12}
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "version": 2,
+  "agents": {
+    "defaults": {
+      "workspace": "~/.picoclaw/workspace",
+      "restrict_to_workspace": true,
+      "model_name": "deepseek",
+      "max_tokens": 16384,
+      "max_tool_iterations": 30
+    }
+  },
+  "model_list": [
+    {
+      "model_name": "deepseek",
+      "model": "deepseek/deepseek-chat",
+      "api_keys": ["YOUR_DEEPSEEK_API_KEY_HERE"]
+    }
+  ],
+  "channels": {
+    "weixin": {
+      "enabled": true,
+      "token": "",
+      "allow_from": [],
+      "proxy": ""
+    }
+  },
+  "tools": {
+    "mcp": {
+      "enabled": true,
+      "servers": {
+        "fatloss": {
+          "enabled": true,
+          "command": "C:/Users/liuhao39/.workbuddy/binaries/python/versions/3.13.12/python.exe",
+          "args": ["D:/WorkBuddy 工作空间/2026-06-17-09-53-32/fatloss-tracker/mcp_server/server.py"],
+          "env": {
+            "DEEPSEEK_API_KEY": "YOUR_DEEPSEEK_API_KEY_HERE"
+          }
+        }
+      }
+    },
+    "web": {
+      "duckduckgo": {
+        "enabled": true,
+        "max_results": 3
+      }
+    }
+  },
+  "gateway": {
+    "host": "127.0.0.1",
+    "port": 18790,
+    "log_level": "info"
+  }
+}

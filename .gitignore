@@ -1,6 +1,10 @@
-data/fatloss.db
+# API keys & secrets
+mcp_server/config.json
+
+# Generated outputs
 output.txt
 outputs/
-scripts/__pycache__/
+
+# Python cache
+__pycache__/
 *.pyc
-scripts/push_to_github.py
