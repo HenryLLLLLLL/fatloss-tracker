@@ -1,0 +1,6 @@
+data/fatloss.db
+output.txt
+outputs/
+scripts/__pycache__/
+*.pyc
+scripts/push_to_github.py
