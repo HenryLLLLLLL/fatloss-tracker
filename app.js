@@ -296,6 +296,8 @@ async function loadDashboard() {
       calories_in: dietByDate[date] ? Math.round(dietByDate[date].calories_in) : 0,
       calories_out: trainByDate[date] ? Math.round(trainByDate[date].calories_out) : 0,
       protein_g: dietByDate[date] ? Math.round(dietByDate[date].protein_g) : 0,
+      carbs_g: dietByDate[date] ? Math.round(dietByDate[date].carbs_g) : 0,
+      fat_g: dietByDate[date] ? Math.round(dietByDate[date].fat_g) : 0,
       training_types: trainByDate[date] ? trainByDate[date].training_types.join(',') : ''
     };
   }).filter(d => d.calories_in > 0 || d.calories_out > 0);
