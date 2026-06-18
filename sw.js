@@ -1,5 +1,5 @@
 // FatLoss Service Worker
-const CACHE = 'fatloss-v1';
+const CACHE = 'fatloss-v2';
 const ASSETS = ['/', '/index.html', '/manifest.json', '/config.js', '/app.js'];
 
 self.addEventListener('install', e => {
