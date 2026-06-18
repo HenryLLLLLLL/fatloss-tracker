@@ -285,16 +285,35 @@ async function loadDashboard() {
     }
   });
   
+  // BMR helper: get resting metabolic rate for a given date
+  const getBMR = (date) => {
+    // 1. Prefer BMR from weight record on that exact date
+    const w = weightData.find(x => x.date === date);
+    if (w && w.bmr_kcal) return w.bmr_kcal;
+    // 2. Fall back to the most recent BMR measurement
+    const latestWithBMR = [...weightData].reverse().find(x => x.bmr_kcal);
+    if (latestWithBMR) return latestWithBMR.bmr_kcal;
+    // 3. Estimate from latest weight (~22 kcal per kg per day)
+    const latestW = w || weightData[weightData.length - 1];
+    if (latestW && latestW.weight_kg) return Math.round(latestW.weight_kg * 22);
+    // 4. Ultimate fallback
+    return cfg.daily_cal_target + 500;
+  };
+
   // Merge into daily summaries
   const allDates = [...new Set([...Object.keys(dietByDate), ...Object.keys(trainByDate)])].sort();
   const dailySummaries = allDates.map(date => {
     const w = weightData.find(x => x.date === date);
+    const trainCal = trainByDate[date] ? Math.round(trainByDate[date].calories_out) : 0;
+    const bmr = getBMR(date);
     return {
       date,
       weight_kg: w ? w.weight_kg : null,
       bodyfat_pct: w ? w.bodyfat_pct : null,
       calories_in: dietByDate[date] ? Math.round(dietByDate[date].calories_in) : 0,
-      calories_out: trainByDate[date] ? Math.round(trainByDate[date].calories_out) : 0,
+      calories_out: trainCal + bmr,
+      bmr_kcal: bmr,
+      train_cal: trainCal,
       protein_g: dietByDate[date] ? Math.round(dietByDate[date].protein_g) : 0,
       carbs_g: dietByDate[date] ? Math.round(dietByDate[date].carbs_g) : 0,
       fat_g: dietByDate[date] ? Math.round(dietByDate[date].fat_g) : 0,
@@ -471,7 +490,7 @@ function renderDataTable(cfg, dailySummaries, weightData) {
       <td>${w ? '<strong>' + w.weight_kg + '</strong> kg' : '--'}</td>
       <td>${w && w.bodyfat_pct ? w.bodyfat_pct + '%' : '--'}</td>
       <td>${d.calories_in} kcal</td>
-      <td>${d.calories_out} kcal</td>
+      <td>${d.calories_out} kcal${d.train_cal > 0 ? ' (运动' + d.train_cal + ')' : ''}</td>
       <td style="color:${netColor}">${netSign}${net} kcal</td>
       <td>${d.protein_g}g</td>
       <td style="font-size:11px">${d.training_types || '--'}</td>
