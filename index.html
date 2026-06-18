@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="manifest" href="manifest.json">
+<title>FatLoss 减脂追踪</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f5f5f7;
+  --card:#fff;
+  --text:#1d1d1f;
+  --sub:#6e6e73;
+  --border:#e5e5ea;
+  --accent:#0071e3;
+  --green:#34c759;
+  --red:#ff3b30;
+  --orange:#ff9500;
+  --purple:#af52de;
+  --protein:#ff6b6b;
+  --carbs:#ffd93d;
+  --fat:#6bcb77;
+  --radius:14px;
+  --radius-sm:10px;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+/* Header */
+.header{
+  background:var(--card);
+  padding:12px 16px;
+  position:sticky;top:0;z-index:100;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.header h1{font-size:18px;font-weight:600;flex:1}
+.header .badge{
+  background:var(--green);color:#fff;
+  font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600;
+}
+/* Tabs */
+.tabs{
+  display:flex;background:var(--card);
+  position:sticky;top:53px;z-index:99;
+  border-bottom:1px solid var(--border);padding:0 16px;gap:4px;
+}
+.tab-btn{
+  flex:1;padding:12px 0;text-align:center;
+  font-size:14px;font-weight:500;color:var(--sub);
+  background:none;border:none;border-bottom:2px solid transparent;
+  cursor:pointer;transition:all .2s;
+}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+/* Sections */
+.section{display:none;padding:16px;padding-bottom:100px}
+.section.active{display:block}
+/* Cards */
+.card{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px;margin-bottom:14px;
+  border:1px solid var(--border);
+}
+.card h3{font-size:14px;font-weight:600;margin-bottom:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px}
+.card h2{font-size:32px;font-weight:700;margin:4px 0}
+.card .unit{font-size:14px;font-weight:400;color:var(--sub)}
+.card .sub-row{display:flex;gap:20px;margin-top:6px;font-size:13px;color:var(--sub)}
+/* Stat grid */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:14px;border:1px solid var(--border);
+  text-align:center;
+}
+.stat-card .value{font-size:26px;font-weight:700}
+.stat-card .label{font-size:12px;color:var(--sub);margin-top:4px}
+.stat-card .delta{font-size:12px;margin-top:2px}
+.stat-card .delta.good{color:var(--green)}
+.stat-card .delta.warn{color:var(--orange)}
+.stat-card .delta.bad{color:var(--red)}
+/* Charts */
+.chart-wrap{position:relative;height:220px;margin:8px 0}
+.chart-wrap.tall{height:280px}
+canvas{width:100%!important}
+/* Forms */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;font-weight:500;margin-bottom:5px;color:var(--sub)}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:10px 12px;border:1px solid var(--border);
+  border-radius:var(--radius-sm);font-size:15px;
+  background:var(--bg);color:var(--text);
+  font-family:inherit;-webkit-appearance:none;
+}
+.form-group input:focus,.form-group select:focus{
+  outline:none;border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(0,113,227,.15);
+}
+.form-row{display:flex;gap:10px}
+.form-row .form-group{flex:1}
+.btn{
+  width:100%;padding:12px;border:none;border-radius:var(--radius-sm);
+  font-size:16px;font-weight:600;cursor:pointer;
+  color:#fff;background:var(--accent);
+  transition:opacity .2s;
+}
+.btn:active{opacity:.8}
+.btn-outline{
+  background:transparent;color:var(--accent);
+  border:1.5px solid var(--accent);
+}
+/* Meal type tabs inside form */
+.meal-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.meal-tab{
+  padding:7px 14px;border-radius:20px;font-size:13px;
+  border:1px solid var(--border);background:var(--bg);
+  color:var(--sub);cursor:pointer;transition:all .2s;
+}
+.meal-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* Training type tabs */
+.type-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.type-tab{
+  padding:7px 14px;border-radius:20px;font-size:13px;
+  border:1px solid var(--border);background:var(--bg);
+  color:var(--sub);cursor:pointer;transition:all .2s;
+}
+.type-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* Quick meal */
+.quick-meals{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.quick-meal{
+  padding:5px 10px;border-radius:15px;font-size:12px;
+  border:1px solid var(--border);background:var(--bg);
+  color:var(--sub);cursor:pointer;
+}
+.quick-meal:active{background:var(--accent);color:#fff}
+/* History table */
+.history-list{max-height:70vh;overflow-y:auto}
+.history-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 0;border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+.history-item .date{font-size:12px;color:var(--sub)}
+.history-item .detail{font-size:13px}
+.history-item .tag{
+  font-size:11px;padding:2px 8px;border-radius:10px;
+  font-weight:500;
+}
+.tag-weight{background:#e8f5e9;color:#2e7d32}
+.tag-diet{background:#fff3e0;color:#e65100}
+.tag-training{background:#e3f2fd;color:#1565c0}
+/* Toast */
+.toast{
+  position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
+  background:#1d1d1f;color:#fff;padding:10px 24px;border-radius:20px;
+  font-size:14px;font-weight:500;z-index:200;
+  opacity:0;transition:opacity .3s;
+}
+.toast.show{opacity:1}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+/* Empty state */
+.empty{padding:40px 16px;text-align:center;color:var(--sub);font-size:14px}
+.empty .icon{font-size:40px;margin-bottom:10px}
+/* Loading */
+.loading{text-align:center;padding:30px;color:var(--sub)}
+.spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Modal for weight entry */
+.modal-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.4);z-index:150;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.modal{
+  background:var(--card);width:100%;max-width:500px;
+  border-radius:var(--radius) var(--radius) 0 0;
+  padding:20px 16px 30px;animation:slideUp .3s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+/* Weight form sections */
+.section-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;margin-top:8px;
+  border-bottom:1px solid var(--border);
+  font-size:13px;font-weight:600;color:var(--accent);
+  cursor:pointer;user-select:none;
+}
+.section-header .toggle-arrow{font-size:10px;transition:transform .2s}
+.field-group{padding:6px 0}
+.field-group.collapsed{display:none}
+.field-group.collapsed + .section-header .toggle-arrow,
+.section-header:has(+ .field-group.collapsed) .toggle-arrow{transform:rotate(-90deg)}
+/* Body comp mini gauges */
+.bf-gauge{
+  display:flex;gap:6px;margin-top:6px;
+}
+.bf-item{
+  flex:1;text-align:center;background:var(--bg);
+  border-radius:var(--radius-sm);padding:8px 4px;
+}
+.bf-item .bf-val{font-size:16px;font-weight:700}
+.bf-item .bf-label{font-size:10px;color:var(--sub);margin-top:2px}
+.bf-item .bf-bar{
+  height:4px;border-radius:2px;margin-top:4px;
+  background:var(--border);overflow:hidden;
+}
+.bf-item .bf-fill{height:100%;border-radius:2px;transition:width .5s}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>FatLoss 减脂追踪</h1>
+  <span class="badge" id="statusBadge">目标65kg</span>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="dashboard">仪表盘</button>
+  <button class="tab-btn" data-tab="record">记录</button>
+  <button class="tab-btn" data-tab="history">历史</button>
+</div>
+
+<!-- === DASHBOARD === -->
+<div class="section active" id="section-dashboard">
+  <div id="dashboardContent">
+    <div class="loading"><div class="spinner"></div>加载中...</div>
+  </div>
+</div>
+
+<!-- === RECORD === -->
+<div class="section" id="section-record">
+  <div class="card">
+    <h3>录入类型</h3>
+    <div class="meal-tabs" style="justify-content:stretch">
+      <button class="meal-tab active" data-form="weight" style="flex:1;text-align:center">体重</button>
+      <button class="meal-tab" data-form="diet" style="flex:1;text-align:center">饮食</button>
+      <button class="meal-tab" data-form="training" style="flex:1;text-align:center">训练</button>
+    </div>
+  </div>
+
+  <!-- Weight Form -->
+  <form id="weightForm" class="card form-section">
+    <h3>体重 & 体成分</h3>
+    <div class="form-group"><label>日期</label><input type="date" id="wDate" required></div>
+
+    <div class="section-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+      <span>基本数据</span><span class="toggle-arrow">▼</span>
+    </div>
+    <div class="field-group">
+      <div class="form-row">
+        <div class="form-group"><label>体重 (kg)*</label><input type="number" id="wWeight" step="0.1" min="40" max="100" placeholder="如 73.8" required></div>
+        <div class="form-group"><label>BMI</label><input type="number" id="wBmi" step="0.1" min="10" max="50" placeholder="如 25.7"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>体脂率 (%)</label><input type="number" id="wBodyfat" step="0.1" min="5" max="50" placeholder="如 22.8"></div>
+        <div class="form-group"><label>基础代谢 (kcal)</label><input type="number" id="wBmr" min="1000" max="3000" placeholder="如 1629"></div>
+      </div>
+    </div>
+
+    <div class="section-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+      <span>肌肉 & 体成分</span><span class="toggle-arrow">▼</span>
+    </div>
+    <div class="field-group">
+      <div class="form-row">
+        <div class="form-group"><label>脂肪量 (kg)</label><input type="number" id="wFatMass" step="0.1" min="0" max="50" placeholder="如 17.2"></div>
+        <div class="form-group"><label>去脂体重 (kg)</label><input type="number" id="wLeanMass" step="0.1" min="20" max="80" placeholder="如 57.1"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>肌肉量 (kg)</label><input type="number" id="wMuscle" step="0.1" min="20" max="80" placeholder="如 54.5"></div>
+        <div class="form-group"><label>肌肉率 (%)</label><input type="number" id="wMuscleRate" step="0.1" min="30" max="90" placeholder="如 73.3"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>骨骼肌率 (%)</label><input type="number" id="wSkeletalMuscle" step="0.1" min="20" max="60" placeholder="如 42.5"></div>
+        <div class="form-group"><label>骨量 (kg)</label><input type="number" id="wBoneMass" step="0.01" min="1" max="6" placeholder="如 3.15"></div>
+      </div>
+    </div>
+
+    <div class="section-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+      <span>水分 & 蛋白质</span><span class="toggle-arrow">▼</span>
+    </div>
+    <div class="field-group">
+      <div class="form-row">
+        <div class="form-group"><label>水分率 (%)</label><input type="number" id="wWaterRate" step="0.1" min="30" max="80" placeholder="如 55.2"></div>
+        <div class="form-group"><label>体水分 (kg)</label><input type="number" id="wWaterKg" step="0.1" min="20" max="60" placeholder="如 41.0"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>蛋白率 (%)</label><input type="number" id="wProteinRate" step="0.1" min="5" max="25" placeholder="如 17.5"></div>
+        <div class="form-group"><label>皮下脂肪率 (%)</label><input type="number" id="wSubFat" step="0.1" min="5" max="40" placeholder="如 19.5"></div>
+      </div>
+    </div>
+
+    <div class="section-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+      <span>健康指标</span><span class="toggle-arrow">▼</span>
+    </div>
+    <div class="field-group">
+      <div class="form-row">
+        <div class="form-group"><label>内脏脂肪等级</label><input type="number" id="wVisceral" min="1" max="30" placeholder="如 8"></div>
+        <div class="form-group"><label>身体年龄</label><input type="number" id="wBodyAge" min="18" max="99" placeholder="如 28"></div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn" style="margin-top:8px">保存体成分数据</button>
+  </form>
+
+  <!-- Diet Form -->
+  <form id="dietForm" class="card form-section" style="display:none">
+    <h3>饮食记录</h3>
+    <div class="form-group">
+      <label>日期</label>
+      <input type="date" id="dDate" required>
+    </div>
+    <div class="form-group">
+      <label>餐次</label>
+      <div class="meal-tabs" id="mealTypeTabs">
+        <button type="button" class="meal-tab active" data-meal="breakfast">早餐</button>
+        <button type="button" class="meal-tab" data-meal="lunch">午餐</button>
+        <button type="button" class="meal-tab" data-meal="dinner">晚餐</button>
+        <button type="button" class="meal-tab" data-meal="snack">加餐</button>
+        <button type="button" class="meal-tab" data-meal="supplement">补剂</button>
+        <button type="button" class="meal-tab" data-meal="summary">全天汇总</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>食物描述</label>
+      <textarea id="dFood" rows="2" placeholder="如：2个水煮蛋 + 1杯牛奶 + 1根香蕉" required></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>热量 (kcal)</label>
+        <input type="number" id="dCal" min="0" max="5000" placeholder="如 300" required>
+      </div>
+      <div class="form-group">
+        <label>蛋白质 (g)</label>
+        <input type="number" id="dPro" step="0.1" min="0" max="300" placeholder="如 20">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>碳水 (g)</label>
+        <input type="number" id="dCarbs" step="0.1" min="0" max="500" placeholder="如 30">
+      </div>
+      <div class="form-group">
+        <label>脂肪 (g)</label>
+        <input type="number" id="dFat" step="0.1" min="0" max="200" placeholder="如 10">
+      </div>
+    </div>
+    <div class="quick-meals">
+      <span style="font-size:12px;color:var(--sub);line-height:24px">快速填:</span>
+      <button type="button" class="quick-meal" data-cal="70" data-pro="6" data-carbs="1" data-fat="5">🥚 鸡蛋</button>
+      <button type="button" class="quick-meal" data-cal="165" data-pro="31" data-carbs="0" data-fat="3">🍗 鸡胸100g</button>
+      <button type="button" class="quick-meal" data-cal="160" data-pro="8" data-carbs="12" data-fat="8">🥛 牛奶250ml</button>
+      <button type="button" class="quick-meal" data-cal="116" data-pro="2.6" data-carbs="25" data-fat="0.3">🍚 米饭100g</button>
+      <button type="button" class="quick-meal" data-cal="120" data-pro="25" data-carbs="3" data-fat="1">💪 蛋白粉</button>
+      <button type="button" class="quick-meal" data-cal="105" data-pro="1.3" data-carbs="27" data-fat="0.4">🍌 香蕉</button>
+    </div>
+    <button type="submit" class="btn" style="margin-top:12px">保存饮食</button>
+  </form>
+
+  <!-- Training Form -->
+  <form id="trainingForm" class="card form-section" style="display:none">
+    <h3>训练记录</h3>
+    <div class="form-group">
+      <label>日期</label>
+      <input type="date" id="tDate" required>
+    </div>
+    <div class="form-group">
+      <label>训练类型</label>
+      <div class="type-tabs" id="trainingTypeTabs">
+        <button type="button" class="type-tab active" data-type="boxing_strength">打拳主+力量辅</button>
+        <button type="button" class="type-tab" data-type="strength_cardio">力量主+有氧辅</button>
+        <button type="button" class="type-tab" data-type="boxing">纯打拳</button>
+        <button type="button" class="type-tab" data-type="strength">纯力量</button>
+        <button type="button" class="type-tab" data-type="cardio">纯有氧</button>
+        <button type="button" class="type-tab" data-type="rest">休息</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>训练部位</label>
+      <select id="tFocus">
+        <option value="full_body">全身</option>
+        <option value="upper">上肢</option>
+        <option value="lower">下肢</option>
+        <option value="back">背</option>
+        <option value="chest">胸</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>时长 (分钟)</label>
+        <input type="number" id="tDuration" min="0" max="300" placeholder="如 90" required>
+      </div>
+      <div class="form-group">
+        <label>消耗 (kcal)</label>
+        <input type="number" id="tCal" min="0" max="3000" placeholder="如 500" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>超级组轮数 (仅力量训练)</label>
+      <input type="number" id="tSuperset" min="0" max="10" placeholder="如 2">
+    </div>
+    <button type="submit" class="btn">保存训练</button>
+  </form>
+</div>
+
+<!-- === HISTORY === -->
+<div class="section" id="section-history">
+  <div class="card">
+    <h3>数据历史</h3>
+    <div class="history-list" id="historyList">
+      <div class="loading"><div class="spinner"></div>加载中...</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js?v=1"></script>
+</body>
+</html>
